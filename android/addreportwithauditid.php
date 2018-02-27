@@ -4,6 +4,7 @@ if ($data[0]["key"] != "kreation"){
 	die();
 }
 $mauditid = $data[0]["auditid"];
+
 $msku = $data[0]["sku"];
 $mdesc = $data[0]["desc"];
 $msnap = $data[0]["snap"];
