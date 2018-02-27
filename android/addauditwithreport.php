@@ -10,6 +10,7 @@ $maql = $data[0]["aql"];
 $mdesc = $data[0]["desc"];
 $minspec = $data[0]["inspec"];
 $msnap = $data[0]["snap"];
+$muser = $data[0]["user"];
 // SQL Server Extension Sample Code:
 $connectionInfo = array("UID" => "lpalomares@cmdemo", "pwd" => "Pareto20172a", "Database" => "Demo01", "LoginTimeout" => 30, "Encrypt" => 1, "TrustServerCertificate" => 0);
 $serverName = "tcp:cmdemo.database.windows.net,1433";
@@ -21,22 +22,19 @@ $tsql = "
 DECLARE @idaudit int;  
 DECLARE @idreport int; 
 INSERT INTO tbaudits (fstype, fsskuid, fsuserid, fsqty, fsinspectqty, fsaql, fsdate) VALUES (
-'final', (SELECT TOP 1 fsid FROM tbsku WHERE fssku = 'J2222'), 1, '3', '3', '3', GETDATE());
+'$mtipo', (SELECT TOP 1 fsid FROM tbsku WHERE fssku = '$msku'), (SELECT fsid FROM tbusers WHERE fsusername = '$muser')
+    , '$mqty', '$minspec', '$maql', GETDATE());
 SET @idaudit = SCOPE_IDENTITY(); 
 INSERT INTO tbreports (fsskuid, fsdescription, fsdate, fsuserid, fsauditid) 
 VALUES (
-    (SELECT TOP 1 fsid FROM tbsku WHERE fssku = 'J2222')
-    , 'a las 430'
+    (SELECT TOP 1 fsid FROM tbsku WHERE fssku = '$msku')
+    , '$mdesc'
     , GETDATE()
-    , 1
+    , (SELECT fsid FROM tbusers WHERE fsusername = '$muser')
     , @idaudit
 );
 SET @idreport = SCOPE_IDENTITY();
-INSERT INTO tbsnaps (fsreportid, fsbase64snap) VALUES (@idreport, '');  
---SELECT TOP 1 fsid FROM tbaudits ORDER BY fsid DESC; 
---SELECT @idaudit AS 'LAST_ID_INSERTED';
-
-";
+INSERT INTO tbsnaps (fsreportid, fsbase64snap) VALUES (@idreport, '$msnap');";
 
 $stmt = sqlsrv_query($conn, $tsql);
 //validar primer query ejecuta correctamente
